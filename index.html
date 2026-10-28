@@ -9,10 +9,10 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 html,body{height:100%;margin:0;background:var(--bg);overflow:hidden;touch-action:none;font-family:Georgia,"Times New Roman",serif;color:var(--fg)}
 #c{position:fixed;inset:0;width:100%;height:100%;display:block}
-#intro{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;background:rgba(7,7,8,.88);cursor:pointer}
+#intro{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;text-align:center;padding:24px;background:rgba(7,7,8,.28);cursor:pointer;transition:background .8s}
 #intro h1{font-weight:400;font-size:clamp(30px,8vw,56px);letter-spacing:.04em;margin:0 0 14px}
 #intro p{max-width:34ch;line-height:1.6;color:var(--mut);margin:0 0 22px}
-#intro b{font-weight:400;border:1px solid var(--ac);padding:10px 22px;color:var(--fg);opacity:.45;pointer-events:none;transition:opacity .4s,background .4s}
+#intro b{font-weight:400;border:1px solid var(--ac);padding:10px 22px;color:var(--fg);opacity:.45;pointer-events:none;transition:opacity .4s,background .4s;margin-bottom:calc(3vh + env(safe-area-inset-bottom,0px));background:rgba(7,7,8,.5)}
 #intro.ready b{opacity:1;pointer-events:auto}
 #loadbox{width:min(330px,82vw);margin:4px 0 22px;text-align:left}
 #loadmeta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;color:var(--mut);font-size:12px;letter-spacing:.05em}
@@ -34,7 +34,7 @@ html,body{height:100%;margin:0;background:var(--bg);overflow:hidden;touch-action
 <div id="hint">Links ziehen: gehen. Rechts ziehen: umschauen. (Am PC: WASD und Maus)</div>
 <button id="mode">Ansicht: 3D-Modell</button>
 <div id="info"><h2></h2><em></em><p></p></div>
-<div id="intro"><h1>Museum der Triebe</h1><p>Drei Figuren. Bei jeder fehlt eine der drei Instanzen aus Freuds Modell. Geh nah heran.</p><div id="loadbox" aria-live="polite"><div id="loadmeta"><span id="loadstate">Ausstellung wird geladen</span><span id="loadpct">6%</span></div><div id="loadtrack"><i id="loadbar"></i></div><small id="loadnote">Eintritt wird vorbereitet · <a href="https://github.com/LegedsDaD/BufferLab" target="_blank" rel="noreferrer">BufferLab-Loader</a></small></div><b>Eintreten</b></div>
+<div id="intro" aria-label="Partikel-Ladebild"><b>Eintreten</b></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/objects/Reflector.js"></script>
@@ -42,7 +42,7 @@ html,body{height:100%;margin:0;background:var(--bg);overflow:hidden;touch-action
 let FOVB=80,FOCUS=null,LOOKT=0;
 const loadIntro=document.getElementById('intro'),loadBar=document.getElementById('loadbar'),loadPct=document.getElementById('loadpct'),loadState=document.getElementById('loadstate');
 let loadingValue=6,loadingReady=false;
-function loadTo(value,label){loadingValue=Math.max(loadingValue,value);loadBar.style.width=loadingValue+'%';loadPct.textContent=Math.round(loadingValue)+'%';if(label)loadState.textContent=label}
+function loadTo(value,label){loadingValue=Math.max(loadingValue,value);if(loadBar)loadBar.style.width=loadingValue+'%';if(loadPct)loadPct.textContent=Math.round(loadingValue)+'%';if(label&&loadState)loadState.textContent=label}
 const T=THREE,c=document.getElementById('c');
 const r=new T.WebGLRenderer({canvas:c,antialias:true});r.setPixelRatio(Math.min(devicePixelRatio,2));r.outputEncoding=T.sRGBEncoding;r.toneMapping=T.ACESFilmicToneMapping;r.toneMappingExposure=1.2;loadTo(20,'Raum wird aufgebaut');
 const s=new T.Scene();s.background=new T.Color(0x070708);s.fog=new T.FogExp2(0x0b0608,.016);
@@ -281,7 +281,7 @@ c.addEventListener('pointerdown',e=>{c.setPointerCapture(e.pointerId);ptr[e.poin
 c.addEventListener('pointermove',e=>{const p=ptr[e.pointerId];if(!p)return;if(p.m){mv.x=cl((e.clientX-p.sx)/55,-1,1);mv.y=cl((e.clientY-p.sy)/55,-1,1)}else{LOOKT=performance.now();yaw-=(e.clientX-p.lx)*.005;pitch=cl(pitch-(e.clientY-p.ly)*.005,-1.2,1.2)}p.lx=e.clientX;p.ly=e.clientY});
 const up=e=>{const p=ptr[e.pointerId];if(p&&p.m){mv.x=mv.y=0}delete ptr[e.pointerId]};
 c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
-document.getElementById('intro').addEventListener('click',function(){if(!loadingReady)return;this.style.display='none';if(T0===null){T0=clk.elapsedTime;initAudio()}});
+document.getElementById('intro').addEventListener('click',function(){if(!loadingReady)return;this.style.display='none';if(bustDust)bustDust.p.visible=false;if(T0===null){T0=clk.elapsedTime;initAudio()}});
 let ph=false;const mb=document.getElementById("mode");mb.addEventListener("click",()=>{ph=!ph;defs.forEach(o=>{o.p[0].visible=ph;o.p[1].visible=!ph});mb.textContent=ph?"Ansicht: Foto":"Ansicht: 3D-Modell"});
 (function(){const XW=4.15,H=4.5,C3=[0xff2a1a,0xbfe6ff,0xffd36a],LC=['#ff6a58','#bfe6ff','#ffd36a'],NM=['Das Es','Das Ich','Das Über-Ich'];
 const wl=mt(2,1,{roughness:.45,emissive:0x16161c}),LGT=new T.MeshBasicMaterial({color:0x8a9099,toneMapped:false});
@@ -331,7 +331,7 @@ const BUST_URL='/manus-storage/freud_bueste_fotoreferenz_highres_854efeae.glb',B
 let bustReady=false,bustMorphStart=0,bustDone=false,introDone=false;
 for(let i=0;i<BUST_N;i++){const u=Math.random(),a=Math.random()*6.283,r=.4+Math.random()*4.4;bustCloud[i*3]=Math.cos(a)*r;bustCloud[i*3+1]=.5+Math.random()*4.4;bustCloud[i*3+2]=8.4+(Math.random()-.5)*5.5;bustDust.a[i*3]=bustCloud[i*3];bustDust.a[i*3+1]=bustCloud[i*3+1];bustDust.a[i*3+2]=bustCloud[i*3+2]}
 bustDust.p.material.opacity=.86;
-function finishIntro(){if(introDone)return;introDone=true;loadTo(100,'Ausstellung bereit');loadingReady=true;loadIntro.classList.add('ready');loadState.textContent='Bereit zum Eintreten';document.getElementById('loadnote').textContent='Die Ausstellung ist geöffnet'}
+function finishIntro(){if(introDone)return;introDone=true;loadTo(100,'Ausstellung bereit');loadingReady=true;loadIntro.classList.add('ready');if(loadState)loadState.textContent='Bereit zum Eintreten';const note=document.getElementById('loadnote');if(note)note.textContent='Die Ausstellung ist geöffnet'}
 function prepareBust(root){const verts=[];const v=new T.Vector3();root.updateMatrixWorld(true);root.traverse(o=>{const a=o.geometry&&o.geometry.attributes&&o.geometry.attributes.position;if(!o.isMesh||!a)return;const stride=Math.max(1,Math.floor(a.count/50000));for(let i=0;i<a.count;i+=stride){v.fromBufferAttribute(a,i).applyMatrix4(o.matrixWorld);verts.push(v.x,v.y,v.z)}});if(!verts.length)throw Error('Die Büste enthält keine Positionsdaten');const box=new T.Box3(),q=new T.Vector3();for(let i=0;i<verts.length;i+=3)box.expandByPoint(q.set(verts[i],verts[i+1],verts[i+2]));const center=box.getCenter(new T.Vector3()),size=box.getSize(new T.Vector3()),scale=3.55/Math.max(size.y,.001);for(let i=0;i<BUST_N;i++){const j=(Math.random()*verts.length/3|0)*3;bustTarget[i*3]=(verts[j]-center.x)*scale;bustTarget[i*3+1]=(verts[j+1]-box.min.y)*scale+.18;bustTarget[i*3+2]=(verts[j+2]-center.z)*scale+9.1}bustReady=true;bustMorphStart=performance.now();loadTo(95,'Partikel setzen sich zur Büste')}
 new T.GLTFLoader().load(BUST_URL,gl=>{try{prepareBust(gl.scene)}catch(e){console.error(e);loadTo(96,'Büstenform wird vorbereitet')}},xhr=>{if(xhr.lengthComputable&&xhr.total)loadTo(72+Math.min(21,xhr.loaded/xhr.total*21),'Freud-Büste wird geladen')},e=>{console.error('Büste konnte nicht geladen werden',e);loadTo(96,'Ausstellung wird ohne Büste geöffnet');setTimeout(finishIntro,900)});
 const cfx=[0,1,2].map(i=>Object.assign(mkP(44,C3[i],i==2?.12:.15),{i,x:-3.15,z:R1[i][0]}));
@@ -350,7 +350,7 @@ const cA=new T.Color(),cB=new T.Color(),W3=new T.Color(0xdfe6ff);
 const FXU=(t,dt)=>{
 const k0=(t/3.5)%3,i0=Math.floor(k0);cA.setHex(C3[i0]);cB.setHex(C3[(i0+1)%3]);cA.lerp(cB,k0-i0);runM.color.copy(cA);slitM.color.copy(cA);dash.offset.x=-t*.4;
 for(let i=0;i<160;i++){const u=dsd[i];dust.a[i*3]=-3.8+((u*7.7)%1)*7.6+Math.sin(t*.4+i)*.15;dust.a[i*3+1]=((u*13.1+t*.04)%1)*4.3;dust.a[i*3+2]=-24-((u*19.3)%1)*24}dust.ge.attributes.position.needsUpdate=true;
-	if(bustReady&&!bustDone){const m=Math.min(1,(performance.now()-bustMorphStart)/4200),e=m*m*(3-2*m),sw=Math.sin(Math.PI*m);for(let i=0;i<BUST_N;i++){const j=i*3,u=(i%17)/17;bustDust.a[j]=bustCloud[j]+(bustTarget[j]-bustCloud[j])*e+Math.sin(t*1.7+i)*.018*sw;bustDust.a[j+1]=bustCloud[j+1]+(bustTarget[j+1]-bustCloud[j+1])*e+Math.cos(t*1.4+i)*.014*sw;bustDust.a[j+2]=bustCloud[j+2]+(bustTarget[j+2]-bustCloud[j+2])*e+Math.sin(t*1.2+i)*.018*sw}bustDust.ge.attributes.position.needsUpdate=true;bustDust.p.material.opacity=.86+.08*Math.sin(t*2);if(m>=1){bustDone=true;setTimeout(finishIntro,650)}}
+	if(bustReady){const cyc=((performance.now()-bustMorphStart)/6500)%1,phase=cyc<.52?cyc/.52:1-(cyc-.52)/.48,e=phase*phase*(3-2*phase),sw=Math.sin(Math.PI*phase);for(let i=0;i<BUST_N;i++){const j=i*3;bustDust.a[j]=bustCloud[j]+(bustTarget[j]-bustCloud[j])*e+Math.sin(t*1.7+i)*.018*sw;bustDust.a[j+1]=bustCloud[j+1]+(bustTarget[j+1]-bustCloud[j+1])*e+Math.cos(t*1.4+i)*.014*sw;bustDust.a[j+2]=bustCloud[j+2]+(bustTarget[j+2]-bustCloud[j+2])*e+Math.sin(t*1.2+i)*.018*sw}bustDust.ge.attributes.position.needsUpdate=true;bustDust.p.material.opacity=.86+.08*Math.sin(t*2);if(!introDone&&phase>.96)finishIntro()}
 cfx.forEach(f=>{const nr=Math.max(0,Math.min(1,(3.4-Math.hypot(pos.x-f.x,pos.z-f.z))/1.6));f.p.material.opacity=.3+.7*nr;f.p.material.size=(f.i==2?.12:.15)*(1+nr*.5);
 for(let k=0;k<f.n;k++){const u=k/f.n;let x,y,z;if(f.i==0){const a=(t*.7+u*7)%1;x=f.x+Math.sin(k*3.1+t*2)*.28*a;y=.15+a*1.9;z=f.z+Math.cos(k*2.3+t*2.4)*.28*a}
 else if(f.i==1){const an=t*.8+u*6.283;x=f.x+Math.cos(an)*.5;y=.5+Math.sin(t*.9+k)*.35+u*.6;z=f.z+Math.sin(an)*.5}
